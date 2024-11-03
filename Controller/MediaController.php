@@ -1,12 +1,12 @@
 <?php
 
 class MediaController {
-    private $connexion; // Propriété pour la connexion
+    private $connexion; 
     private array $medias = []; // Pour stocker les médias
 
     public function __construct($connexion) {
-        $this->connexion = $connexion; // Initialiser la connexion
-        $this->loadMedia(); // Charger les médias à l'initialisation
+        $this->connexion = $connexion; 
+        $this->loadMedia(); 
     }
 
     private function loadMedia(): void {

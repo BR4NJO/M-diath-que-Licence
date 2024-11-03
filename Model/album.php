@@ -1,5 +1,5 @@
 <?php
-require_once 'Media.php'; // Assurez-vous que le chemin est correct
+require_once 'Media.php'; 
 
 class Album extends Media {
     private int $songNumber;
@@ -21,10 +21,10 @@ class Album extends Media {
     }
 
     public function getType(): string {
-        return 'album'; // ou une autre chaîne appropriée pour les albums
+        return 'album'; 
     }
 
-    public function getId(): int { // Ajoutez cette méthode
+    public function getId(): int { 
         return $this->id;
     }
 }

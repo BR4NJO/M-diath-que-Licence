@@ -1,27 +1,25 @@
 <?php 
 require_once '../Model/genre.php';
-require_once '../Model/media.php'; // Fichier contenant la classe Media
-require_once '../Model/book.php'; // Fichier contenant la classe Book
-require_once '../Model/movie.php'; // Fichier contenant la classe Movie
-require_once '../Model/album.php'; // Fichier contenant la classe Album
+require_once '../Model/media.php';
+require_once '../Model/book.php'; 
+require_once '../Model/movie.php'; 
+require_once '../Model/album.php'; 
 
-session_start(); // Démarrer la session
+session_start(); 
 
-// Vérifiez si l'utilisateur est connecté
+
 $isLoggedIn = isset($_SESSION['username']);
 if (!$isLoggedIn) {
     echo "Veuillez vous connecter pour accéder au contenu.";
-    exit; // Arrête le script si l'utilisateur n'est pas connecté
+    exit; 
 }
 
 $username = $_SESSION['username'];
 
-// Classe Dashboard
 class Dashboard {
     private $db;
 
     private function getGenreById($id): Genre {
-        // Récupération des genres basés sur l'ID
         switch ($id) {
             case 1:
                 return Genre::Action;
@@ -32,7 +30,7 @@ class Dashboard {
             case 4:
                 return Genre::Comedy;
             default:
-                return Genre::Action; // Retourne une valeur par défaut ou gérez l'erreur comme vous le souhaitez
+                return Genre::Action; 
         }
     }
 
@@ -41,17 +39,14 @@ class Dashboard {
     }
 
     public function ajouterMedia($media) {
-        // Prepare the SQL statement
         $query = "INSERT INTO media (titre, auteur, type, disponible, pages, duree, genre, nombreChansons, label) 
                   VALUES (:titre, :auteur, :type, :disponible, :pages, :duree, :genre, :nombreChansons, :label)";
         
         $stmt = $this->db->prepare($query);
     
-        // Bind the parameters
         $stmt->bindParam(':titre', $media->getTitre());
         $stmt->bindParam(':auteur', $media->getAuteur());
         
-        // Use variables to avoid passing method calls directly
         $type = $media->getType(); 
         $stmt->bindParam(':type', $type);
         
@@ -69,7 +64,7 @@ class Dashboard {
             $duration = $media->getDuration();
             $stmt->bindValue(':pages', null);
             $stmt->bindParam(':duree', $duration);
-            $genre = $media->getGenre()->name; // Assuming genre is accessible like this
+            $genre = $media->getGenre()->name; 
             $stmt->bindParam(':genre', $genre);
             $stmt->bindValue(':nombreChansons', null);
             $stmt->bindValue(':label', null);
@@ -85,7 +80,7 @@ class Dashboard {
     
         try {
             if ($stmt->execute()) {
-                return true; // The insertion succeeded
+                return true; 
             } else {
                 throw new Exception("Erreur lors de l'exécution de la requête.");
             }
@@ -126,16 +121,14 @@ class Dashboard {
     
         $films = [];
         foreach ($result as $row) {
-            // Récupérer l'objet Genre à partir de genre_id
-            $genre = $this->getGenreById($row['genre_id']); // Récupérez l'objet Genre ici
+            $genre = $this->getGenreById($row['genre_id']); 
     
-            // Créer un nouvel objet Movie avec le bon genre
             $films[] = new Movie(
                 $row['titre'],
                 $row['auteur'],
                 (bool)$row['disponible'],
                 (float)$row['duree'],
-                $genre // Passer l'objet Genre ici
+                $genre 
             );
         }
         return $films;
@@ -152,36 +145,36 @@ class Dashboard {
         $stmt->execute();
         $result = $stmt->fetchAll(PDO::FETCH_ASSOC);
     
-        // Creating Album objects
+
         $albums = [];
         foreach ($result as $row) {
             $albums[] = new Album(
-                $row['titre'], // Titre de l'album
-                $row['auteur'], // Auteur de l'album
-                (bool)$row['disponible'], // Disponibilité
-                (int)$row['nombreChansons'], // Nombre de chansons
-                $row['label'] // Label de l'album
+                $row['titre'], 
+                $row['auteur'],
+                (bool)$row['disponible'],
+                (int)$row['nombreChansons'], 
+                $row['label'] 
             );
         }
         return $albums;
     }
 }
 
-// Inclure le fichier de connexion à la base de données
-require_once '../db.php'; // Assurez-vous que le chemin est correct
 
-// Instanciation de la classe Dashboard
+require_once '../db.php'; 
+
+
 $dashboard = new Dashboard($connexion);
 
 // Récupérer le terme de recherche, s'il existe
 $searchTerm = isset($_POST['search']) ? $_POST['search'] : '';
 
-// Récupérer les données avec filtrage
+
 $livres = $dashboard->getLivres($searchTerm);
 $films = $dashboard->getFilms($searchTerm);
 $albums = $dashboard->getAlbums($searchTerm);
 
-// Le reste de votre code HTML...
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
